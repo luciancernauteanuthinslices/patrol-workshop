@@ -64,8 +64,9 @@ class _HomePageBody extends StatelessWidget {
         PTElevatedButton(
           caption: 'Send notification',
           onPressed: () =>
-              context.read<NotificationHandler>().triggerPushNotification(
+              context.read<NotificationHandler>().triggerLocalNotification(
                     onPressed: () => Navigator.push(context, notificationRoute),
+                    onError: () {},
                   ),
         ),
       ],

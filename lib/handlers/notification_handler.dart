@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dispose_scope/dispose_scope.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
 import 'package:patrol_challenge/handlers/permission_handler.dart';
 import 'package:patrol_challenge/ui/style/colors.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,19 +10,13 @@ import 'package:permission_handler/permission_handler.dart';
 class NotificationHandler {
   NotificationHandler(
     this._flutterLocalNotificationsPlugin,
-    this._firebaseMessaging,
   );
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
-  final FirebaseMessaging _firebaseMessaging;
-
   final _disposeScope = DisposeScope();
 
   Future<void> init(VoidCallback onNotificationTap) async {
     await _init(onNotificationTap);
-    final token = await _firebaseMessaging.getToken();
-    debugPrint('Device FCM token: $token');
-    _listenForPushNotifications();
   }
 
   Future<void> _init(VoidCallback onNotificationTap) async {
@@ -39,11 +30,6 @@ class NotificationHandler {
         ),
       ),
       onDidReceiveNotificationResponse: (_) => onNotificationTap(),
-    );
-    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
     );
   }
 
@@ -66,36 +52,6 @@ class NotificationHandler {
     }
     await _init(onPressed);
     await _showNotification(title: 'Tap me to finish the quiz!');
-  }
-
-  Future<void> triggerPushNotification({
-    required VoidCallback onPressed,
-  }) async {
-    final hasPermission = await _requestPermission();
-    if (!hasPermission) {
-      return;
-    }
-    await _init(onPressed);
-    final fcmToken = await _firebaseMessaging.getToken();
-    await http.post(
-      Uri.parse(
-        'https://us-central1-patrol-poc.cloudfunctions.net/sendNotification',
-      ),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'token': fcmToken}),
-    );
-  }
-
-  void _listenForPushNotifications() {
-    FirebaseMessaging.onMessage.listen((message) {
-      if (message.notification != null) {
-        final notification = message.notification;
-        _showNotification(
-          title: notification?.title ?? '',
-          body: notification?.body,
-        );
-      }
-    }).disposedBy(_disposeScope);
   }
 
   Future<void> _showNotification({

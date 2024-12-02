@@ -74,11 +74,13 @@ class _ProfilePageBody extends StatelessWidget {
               padding: const EdgeInsets.all(32),
               child: PTElevatedButton(
                 key: K.notifyMeButton,
-                onPressed: () =>
-                    context.read<NotificationHandler>().triggerPushNotification(
-                          onPressed: () =>
-                              Navigator.push(context, notificationRoute),
-                        ),
+                onPressed: () => context
+                    .read<NotificationHandler>()
+                    .triggerLocalNotification(
+                      onPressed: () =>
+                          Navigator.push(context, notificationRoute),
+                      onError: () {},
+                    ),
                 caption: 'Notify me!',
               ),
             ),

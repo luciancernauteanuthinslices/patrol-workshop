@@ -51,12 +51,6 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
-        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: "true"
-    }
-
-    testOptions {
-        execution "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     buildTypes {
@@ -85,8 +79,4 @@ android {
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
