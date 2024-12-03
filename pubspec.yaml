@@ -34,7 +34,6 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   leancode_lint: ^6.0.0
-  patrol: ^3.13.0
 
 flutter_launcher_icons:
   android: 'launcher_icon'

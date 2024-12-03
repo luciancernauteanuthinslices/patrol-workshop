@@ -1,4 +1,4 @@
-package com.example.patrol_challenge
+package com.example.patrol.challenge
 
 import io.flutter.embedding.android.FlutterActivity
 
