@@ -29,7 +29,7 @@ android {
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
-    namespace "com.example.patrol.challenge"
+    namespace "pl.leancode.patrol.challenge"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,7 +45,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.patrol.challenge"
+        applicationId "pl.leancode.patrol.challenge"
         minSdkVersion 21
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()

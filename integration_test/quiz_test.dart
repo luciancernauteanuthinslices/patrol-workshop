@@ -7,7 +7,7 @@ import 'package:patrol_challenge/ui/style/colors.dart';
 /// See [PTColors] for color constants
 void main() {
   patrolTest(
-    'test',
+    'quiz can be completed',
     ($) async {
       await initApp();
       await $.pumpWidgetAndSettle(const MyApp());

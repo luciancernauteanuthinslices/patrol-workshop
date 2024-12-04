@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dispose_scope/dispose_scope.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:patrol_challenge/handlers/permission_handler.dart';
@@ -13,7 +12,6 @@ class NotificationHandler {
   );
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
-  final _disposeScope = DisposeScope();
 
   Future<void> init(VoidCallback onNotificationTap) async {
     await _init(onNotificationTap);
