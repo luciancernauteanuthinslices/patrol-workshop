@@ -62,7 +62,7 @@ flutter:
           weight: 600
 
 patrol:
-  flavor: prod
+  flavor: dev
   app_name: Challange
   android:
     package_name: pl.leancode.patrol.challenge
