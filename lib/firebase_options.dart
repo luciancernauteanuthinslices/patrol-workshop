@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:161899692976:android:fc3ef7ca1bb87f10d54c75',
     messagingSenderId: '161899692976',
     projectId: 'patrol-poc',
-    storageBucket: 'patrol-poc.appspot.com',
+    storageBucket: 'patrol-poc.appspot.pl',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,11 +62,11 @@ class DefaultFirebaseOptions {
     appId: '1:161899692976:ios:e6c21bd37b49a052d54c75',
     messagingSenderId: '161899692976',
     projectId: 'patrol-poc',
-    storageBucket: 'patrol-poc.appspot.com',
+    storageBucket: 'patrol-poc.appspot.pl',
     androidClientId:
-        '161899692976-mv2lcsgoqv6oga1ff12pob27e7e76le3.apps.googleusercontent.com',
+        '161899692976-mv2lcsgoqv6oga1ff12pob27e7e76le3.apps.googleusercontent.pl',
     iosClientId:
-        '161899692976-ksb464fv3r9eq3r58n35gficunijd7kv.apps.googleusercontent.com',
-    iosBundleId: 'com.example.patrolConf',
+        '161899692976-ksb464fv3r9eq3r58n35gficunijd7kv.apps.googleusercontent.pl',
+    iosBundleId: 'pl.patrol.patrolConf',
   );
 }

@@ -34,6 +34,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   leancode_lint: ^6.0.0
+  patrol: ^3.10.0
 
 flutter_launcher_icons:
   android: 'launcher_icon'
@@ -59,3 +60,11 @@ flutter:
           weight: 500
         - asset: assets/fonts/Inter-SemiBold.ttf
           weight: 600
+
+patrol:
+  flavor: prod
+  app_name: Challange
+  android:
+    package_name: pl.leancode.patrol.challenge
+  # ios:
+  #   bundle_id: pl.leancode.patrol.challenge.dev
