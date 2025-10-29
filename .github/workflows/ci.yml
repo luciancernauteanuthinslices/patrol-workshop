@@ -35,100 +35,69 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Flutter deps
+      - name: Get Flutter dependencies
         run: flutter pub get
 
-      # Install NDK
-      - name: Install Android NDK
-        run: |
-          echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
-          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
-
-      # Set up local.properties with SDK and Flutter paths (no ndk.dir - deprecated)
-      - name: Set up local.properties
-        run: |
-          FLUTTER_ROOT=$(which flutter | sed 's/\/bin\/flutter$//')
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
-          echo "flutter.sdk=$FLUTTER_ROOT" >> android/local.properties
-          # Remove any existing ndk.dir entries (deprecated)
-          sed -i '/^ndk.dir=/d' android/local.properties || true
-
-      # Print environment info for debugging
-      - name: Flutter and environment info
-        run: |
-          flutter --version
-          flutter doctor -v
-          java -version
-          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
-          echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
-          cat android/local.properties || true
-          ls -la $ANDROID_SDK_ROOT || true
-
-      # Build app + androidTest APKs (wrapper is under android/)
-      - name: Assemble APKs (with detailed logging)
+      # Build debug APKs and Android App Bundle
+      - name: Build APKs and Bundle
         working-directory: android
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon assembleDebug assembleAndroidTest --stacktrace --info 2>&1 | tee ../gradle_build.log
+          ./gradlew --no-daemon assembleDebug :app:assembleAndroidTest bundleRelease
 
       # Verify APKs were created
       - name: Verify APKs exist
         run: |
           echo "Checking for APK files..."
-          ls -lah android/app/build/outputs/apk/debug/ || echo "Debug APK directory not found"
-          ls -lah android/app/build/outputs/apk/androidTest/debug/ || echo "AndroidTest APK directory not found"
-          
-          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+          if [ ! -f "build/app/outputs/apk/debug/app-debug.apk" ]; then
             echo "ERROR: app-debug.apk not found!"
             exit 1
           fi
           
-          if [ ! -f "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" ]; then
+          if [ ! -f "build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk" ]; then
             echo "ERROR: app-debug-androidTest.apk not found!"
             exit 1
           fi
           
-          echo "✓ Both APKs found successfully"
-
-      # Upload Gradle build log for debugging
-      - name: Upload Gradle build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-log-api${{ matrix.api }}
-          path: gradle_build.log
+          if [ ! -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+            echo "ERROR: app-release.aab not found!"
+            exit 1
+          fi
+          
+          echo "✓ All build artifacts found successfully"
+          ls -lh build/app/outputs/apk/debug/app-debug.apk
+          ls -lh build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          ls -lh build/app/outputs/bundle/release/app-release.aab
 
       # Run tests on emulator.wtf for the current matrix device/api
       - name: Run tests on emulator.wtf (API ${{ matrix.api }})
         id: ewt
-        uses: emulator-wtf/run-tests@v0
+        uses: emulator-wtf/run-tests@v1
         with:
           api-token: ${{ secrets.EW_API_TOKEN }}
-          app: android/app/build/outputs/apk/debug/app-debug.apk
-          test: android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-          # one or more devices (comma-separated or multi-line)
+          app: build/app/outputs/apk/debug/app-debug.apk
+          test: build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
           devices: model=${{ matrix.model }},version=${{ matrix.api }},locale=en,orientation=portrait
-          # artifacts/junit from this run will be written here:
           outputs-dir: ewt-results-${{ matrix.api }}
-          # useful options
           num-flaky-test-attempts: 1
           timeout: 15m
           use-orchestrator: true
           clear-package-data: true
 
-      # Publish JUnit to the PR summary
-      - name: JUnit report (API ${{ matrix.api }})
+      # Publish JUnit report to PR
+      - name: Publish JUnit report (API ${{ matrix.api }})
         uses: mikepenz/action-junit-report@v4
         if: always()
         with:
-          report_paths: ewt-results-${{ matrix.api }}/**/*.xml
-          check_name: "Instrumentation (API ${{ matrix.api }})"
+          report_paths: ewt-results-${{ matrix.api }}/junit.xml
+          check_name: "Instrumentation Tests (API ${{ matrix.api }})"
           fail_on_failure: true
 
-      # Upload raw artifacts from emulator.wtf (videos, logs, junit.xml)
-      - name: Upload artifacts (API ${{ matrix.api }})
+      # Upload test artifacts (videos, logs, results)
+      - name: Upload test artifacts (API ${{ matrix.api }})
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ewt-results-api${{ matrix.api }}
           path: ewt-results-${{ matrix.api }}/
+          retention-days: 30

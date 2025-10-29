@@ -11,8 +11,8 @@ dependencies:
   animations: ^2.0.8
   confetti: ^0.7.0
   dispose_scope: ^2.1.0
-  firebase_auth: ^4.16.0
-  firebase_core: ^2.24.0
+  firebase_auth: ^4.17.0
+  firebase_core: ^2.25.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.3
