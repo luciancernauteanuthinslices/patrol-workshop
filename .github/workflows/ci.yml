@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [31, 35]
-        model: [Pixel 7]   # change to a supported id if you prefer another device
+        api: [31, 34]
+        model: [Pixel2]   # use a valid model ID from emulator.wtf
 
     steps:
       - uses: actions/checkout@v4
