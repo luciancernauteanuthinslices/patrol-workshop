@@ -22,17 +22,6 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    
-    // Force all subprojects to use compileSdk 35 or higher
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (compileSdkVersion < 35) {
-                    compileSdkVersion 35
-                }
-            }
-        }
-    }
 }
 subprojects {
     project.evaluationDependsOn(':app')
