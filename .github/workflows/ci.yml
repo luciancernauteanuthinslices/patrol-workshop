@@ -38,6 +38,18 @@ jobs:
       - name: Flutter deps
         run: flutter pub get
 
+      # Install NDK
+      - name: Install Android NDK
+        run: |
+          echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+
+      # Set up local.properties with NDK path
+      - name: Set up local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> android/local.properties
+
       # Print environment info for debugging
       - name: Flutter and environment info
         run: |
@@ -45,6 +57,8 @@ jobs:
           flutter doctor -v
           java -version
           echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+          echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
+          cat android/local.properties || true
           ls -la $ANDROID_SDK_ROOT || true
 
       # Build app + androidTest APKs (wrapper is under android/)
