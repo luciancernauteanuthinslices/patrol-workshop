@@ -22,9 +22,6 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
     
     // Force all subprojects to use compileSdk 35 or higher
     afterEvaluate { project ->
@@ -36,6 +33,9 @@ subprojects {
             }
         }
     }
+}
+subprojects {
+    project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
