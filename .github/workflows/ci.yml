@@ -72,7 +72,7 @@ jobs:
       # Run tests on emulator.wtf for the current matrix device/api
       - name: Run tests on emulator.wtf (API ${{ matrix.api }})
         id: ewt
-        uses: emulator-wtf/run-tests@v1
+        uses: emulator-wtf/run-tests@v0
         with:
           api-token: ${{ secrets.EW_API_TOKEN }}
           app: build/app/outputs/apk/debug/app-debug.apk
