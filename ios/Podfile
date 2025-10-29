@@ -1,7 +1,10 @@
-platform :ios, '12.0'
+platform :ios, '14.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# Override Firebase SDK version to be compatible with GoogleSignIn 8.0
+$FirebaseSDKVersion = '11.0.0'
 
 project 'Runner', {
   'Debug' => :debug,
@@ -42,7 +45,16 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     # Start of the permission_handler configuration
         target.build_configurations.each do |config|
-
+          # Set minimum deployment target for all pods
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+          
+          # Disable code signing for FTL builds
+          config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+          
+          # Fix for Firebase 11.x modular header issue
+          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+          
           config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
             '$(inherited)',
 

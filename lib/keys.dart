@@ -9,4 +9,7 @@ class PatrolKeys {
   static const notifyMeButton = Key('notifyMeButton');
   static const yourLocationText = Key('yourLocationText');
   static const goBackButton = Key('goBackButton');
+  static const startButton = Key('start_button');
+
+
 }

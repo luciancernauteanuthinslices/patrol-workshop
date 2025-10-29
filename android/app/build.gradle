@@ -31,7 +31,7 @@ android {
     compileSdk 36
     ndkVersion flutter.ndkVersion
 
-    namespace "pl.patrol.challenge"
+    namespace "pl.leancode.patrol.challenge"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -45,6 +45,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
 
     defaultConfig {
@@ -54,9 +55,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
-        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
-        testInstrumentationRunnerArguments["clearPackageData"] = "true"
-
+        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: "true"
     }
 
     testOptions {
@@ -68,23 +68,29 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
 
-    flavorDimensions "default"
-
-    productFlavors {
-        dev {
-            dimension "default"
-            resValue "string", "app_name", "DEV Challenge"
-            applicationIdSuffix ".dev"
-        }
-
-        prod {
-            dimension "default"
-            resValue "string", "app_name", "Challenge"
-        }
-    }
+    // Flavors commented out for Patrol testing compatibility
+    // flavorDimensions "default"
+    //
+    // productFlavors {
+    //     dev {
+    //         dimension "default"
+    //         resValue "string", "app_name", "DEV Challenge"
+    //         applicationIdSuffix ".dev"
+    //     }
+    //
+    //     prod {
+    //         dimension "default"
+    //         resValue "string", "app_name", "Challenge"
+    //     }
+    // }
 }
 
 flutter {
@@ -93,5 +99,5 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-    androidTestUtil("androidx.test:orchestrator:1.5.1")
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }

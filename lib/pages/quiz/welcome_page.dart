@@ -7,6 +7,7 @@ import 'package:patrol_challenge/ui/style/colors.dart';
 import 'package:patrol_challenge/ui/style/test_style.dart';
 import 'package:patrol_challenge/ui/widgets/logos_hero.dart';
 import 'package:patrol_challenge/ui/widgets/utils.dart';
+import 'package:patrol_challenge/keys.dart';
 
 Route<void> get quizWelcomeRoute =>
     MaterialPageRoute(builder: (_) => const _WelcomePage());
@@ -39,6 +40,7 @@ class _WelcomePage extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           PTElevatedButton(
+            key: K.startButton,
             caption: 'Start',
             onPressed: () => Navigator.push(context, formRoute),
           ),
