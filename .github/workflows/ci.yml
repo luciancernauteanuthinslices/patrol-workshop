@@ -68,6 +68,25 @@ jobs:
           chmod +x ./gradlew
           ./gradlew --no-daemon assembleDebug assembleAndroidTest --stacktrace --info 2>&1 | tee ../gradle_build.log
 
+      # Verify APKs were created
+      - name: Verify APKs exist
+        run: |
+          echo "Checking for APK files..."
+          ls -lah android/app/build/outputs/apk/debug/ || echo "Debug APK directory not found"
+          ls -lah android/app/build/outputs/apk/androidTest/debug/ || echo "AndroidTest APK directory not found"
+          
+          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "ERROR: app-debug.apk not found!"
+            exit 1
+          fi
+          
+          if [ ! -f "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" ]; then
+            echo "ERROR: app-debug-androidTest.apk not found!"
+            exit 1
+          fi
+          
+          echo "✓ Both APKs found successfully"
+
       # Upload Gradle build log for debugging
       - name: Upload Gradle build log
         if: always()
