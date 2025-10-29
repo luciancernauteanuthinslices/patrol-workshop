@@ -25,6 +25,17 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
+    
+    // Force all subprojects to use compileSdk 35 or higher
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (compileSdkVersion < 35) {
+                    compileSdkVersion 35
+                }
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
