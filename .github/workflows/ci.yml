@@ -32,7 +32,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
           channel: stable
           cache: true
 
@@ -69,9 +68,9 @@ jobs:
         uses: mikepenz/action-junit-report@v4
         if: always()
         with:
-          report_paths: ewt-results-${{ matrix.api }}/junit.xml
+          report_paths: ewt-results-${{ matrix.api }}/**/*.xml
           check_name: "Instrumentation (API ${{ matrix.api }})"
-          require_tests: true
+          fail_on_failure: true
 
       # Upload raw artifacts from emulator.wtf (videos, logs, junit.xml)
       - name: Upload artifacts (API ${{ matrix.api }})
