@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [31, 34]
-        model: [Pixel5]   # change to a supported id if you prefer another device
+        api: [31, 35]
+        model: [Pixel 7]   # change to a supported id if you prefer another device
 
     steps:
       - uses: actions/checkout@v4
@@ -44,13 +44,14 @@ jobs:
           echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
 
-      # Set up local.properties with SDK, NDK, and Flutter paths
+      # Set up local.properties with SDK and Flutter paths (no ndk.dir - deprecated)
       - name: Set up local.properties
         run: |
           FLUTTER_ROOT=$(which flutter | sed 's/\/bin\/flutter$//')
           echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
-          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> android/local.properties
           echo "flutter.sdk=$FLUTTER_ROOT" >> android/local.properties
+          # Remove any existing ndk.dir entries (deprecated)
+          sed -i '/^ndk.dir=/d' android/local.properties || true
 
       # Print environment info for debugging
       - name: Flutter and environment info
