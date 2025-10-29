@@ -49,9 +49,9 @@ jobs:
       # Run tests on emulator.wtf for the current matrix device/api
       - name: Run tests on emulator.wtf (API ${{ matrix.api }})
         id: ewt
-        uses: emulator-wtf/run-tests@v1
+        uses: emulator-wtf/run-tests@v0
         with:
-          api-token: ${{ secrets.EWT_API_TOKEN }}
+          api-token: ${{ secrets.EW_API_TOKEN }}
           app: android/app/build/outputs/apk/debug/app-debug.apk
           test: android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
           # one or more devices (comma-separated or multi-line)
@@ -62,6 +62,7 @@ jobs:
           num-flaky-test-attempts: 1
           timeout: 15m
           use-orchestrator: true
+          clear-package-data: true
 
       # Publish JUnit to the PR summary
       - name: JUnit report (API ${{ matrix.api }})
