@@ -44,11 +44,13 @@ jobs:
           echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
 
-      # Set up local.properties with NDK path
+      # Set up local.properties with SDK, NDK, and Flutter paths
       - name: Set up local.properties
         run: |
+          FLUTTER_ROOT=$(which flutter | sed 's/\/bin\/flutter$//')
           echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
           echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> android/local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT" >> android/local.properties
 
       # Print environment info for debugging
       - name: Flutter and environment info
