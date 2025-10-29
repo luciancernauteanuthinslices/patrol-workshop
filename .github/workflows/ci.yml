@@ -1,46 +1,81 @@
-name: Run tests
+name: Android instrumentation via emulator.wtf
 
 on:
   push:
-    branches: [ patrol_challenge ]
+    branches: [ main, patrol_challenge ]
+  pull_request:
 
 jobs:
-  android-tests:
+  ewt-tests:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [31, 34]
+        model: [Pixel5]   # change to a supported id if you prefer another device
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
+      - uses: actions/checkout@v4
+
       - name: Set up Java 17 (Temurin) with Gradle cache
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: gradle
-      
-      - uses: subosito/flutter-action@v2
+
+      # Sets ANDROID_SDK_ROOT and accepts licenses (helps Gradle resolve SDKs)
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: 'stable'
+          channel: stable
           cache: true
 
       - name: Flutter deps
         run: flutter pub get
 
-      - name: Build app
-        run: ./gradlew assembleDebug assembleAndroidTest
-      
-      - name: Run tests
-        uses: emulator-wtf/run-tests@v0
+      # Build app + androidTest APKs (wrapper is under android/)
+      - name: Assemble APKs
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug assembleAndroidTest
+
+      # Run tests on emulator.wtf for the current matrix device/api
+      - name: Run tests on emulator.wtf (API ${{ matrix.api }})
+        id: ewt
+        uses: emulator-wtf/run-tests@v1
         with:
-          api-token: ${{ secrets.EW_API_TOKEN }}
-          app: app/build/outputs/apk/debug/app-debug.apk
-          test: app/build/outputs/apk/androidTest/app-debug-androidTest.apk
-          outputs-dir: build/test-results
-      
-      - name: Publish test report
-        uses: mikepenz/action-junit-report@v2
-        if: always() # always run even if the tests fail
+          api-token: ${{ secrets.EWT_API_TOKEN }}
+          app: android/app/build/outputs/apk/debug/app-debug.apk
+          test: android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          # one or more devices (comma-separated or multi-line)
+          devices: model=${{ matrix.model }},version=${{ matrix.api }},locale=en,orientation=portrait
+          # artifacts/junit from this run will be written here:
+          outputs-dir: ewt-results-${{ matrix.api }}
+          # useful options
+          num-flaky-test-attempts: 1
+          timeout: 15m
+          use-orchestrator: true
+
+      # Publish JUnit to the PR summary
+      - name: JUnit report (API ${{ matrix.api }})
+        uses: mikepenz/action-junit-report@v4
+        if: always()
         with:
-          report_paths: 'build/test-results/**/*.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          report_paths: ewt-results-${{ matrix.api }}/junit.xml
+          check_name: "Instrumentation (API ${{ matrix.api }})"
+          require_tests: true
+
+      # Upload raw artifacts from emulator.wtf (videos, logs, junit.xml)
+      - name: Upload artifacts (API ${{ matrix.api }})
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ewt-results-api${{ matrix.api }}
+          path: ewt-results-${{ matrix.api }}/
