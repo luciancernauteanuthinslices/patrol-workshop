@@ -38,12 +38,29 @@ jobs:
       - name: Flutter deps
         run: flutter pub get
 
+      # Print environment info for debugging
+      - name: Flutter and environment info
+        run: |
+          flutter --version
+          flutter doctor -v
+          java -version
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+          ls -la $ANDROID_SDK_ROOT || true
+
       # Build app + androidTest APKs (wrapper is under android/)
-      - name: Assemble APKs
+      - name: Assemble APKs (with detailed logging)
         working-directory: android
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon assembleDebug assembleAndroidTest
+          ./gradlew --no-daemon assembleDebug assembleAndroidTest --stacktrace --info 2>&1 | tee ../gradle_build.log
+
+      # Upload Gradle build log for debugging
+      - name: Upload Gradle build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log-api${{ matrix.api }}
+          path: gradle_build.log
 
       # Run tests on emulator.wtf for the current matrix device/api
       - name: Run tests on emulator.wtf (API ${{ matrix.api }})
