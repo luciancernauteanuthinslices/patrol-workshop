@@ -23,8 +23,6 @@ class NotificationHandler {
 
   Future<void> init(VoidCallback onNotificationTap) async {
     await _init(onNotificationTap);
-    final token = await _firebaseMessaging.getToken();
-    debugPrint('Device FCM token: $token');
     _listenForPushNotifications();
   }
 
