@@ -47,70 +47,16 @@ jobs:
           echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
       - name: Trigger BrowserStack Android build
-        id: trigger
         shell: bash
         run: |
           set -eo pipefail
-          BUILD_ID=$(bash integration_test/run-browserstack-android.sh)
-          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
-          echo "BUILD_ID: $BUILD_ID"
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Wait for build to complete
-        id: wait
-        shell: bash
-        env:
-          BUILD_ID: ${{ steps.trigger.outputs.build_id }}
-        run: |
-          set -eo pipefail
-          echo "Polling BrowserStack build: $BUILD_ID"
-          ATTEMPTS=120
-          SLEEP=15
-          STATUS=""
-          for i in $(seq 1 $ATTEMPTS); do
-            RESP=$(curl -s -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
-              -X GET "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/${BUILD_ID}")
-            STATUS=$(echo "$RESP" | jq -r '.status // empty')
-            PASSED=$(echo "$RESP" | jq -r '[.devices[].sessions[].testcases.status.passed] | add // 0')
-            FAILED=$(echo "$RESP" | jq -r '[.devices[].sessions[].testcases.status.failed] | add // 0')
-            RUNNING=$(echo "$RESP" | jq -r '[.devices[].sessions[].testcases.status.running] | add // 0')
-            echo "Status: ${STATUS:-unknown} | passed=${PASSED:-0} failed=${FAILED:-0} running=${RUNNING:-0} (attempt $i)"
-            if [[ "$STATUS" == "passed" || "$STATUS" == "failed" || "$STATUS" == "error" || "$STATUS" == "timeout" ]]; then
-              echo "status=$STATUS" >> "$GITHUB_OUTPUT"
-              echo "passed=${PASSED:-0}" >> "$GITHUB_OUTPUT"
-              echo "failed=${FAILED:-0}" >> "$GITHUB_OUTPUT"
-              break
-            fi
-            sleep $SLEEP
-          done
-          if [[ -z "$STATUS" ]]; then
-            echo "Timed out waiting for BrowserStack build $BUILD_ID" >&2
-            exit 2
-          fi
-          if [[ "$STATUS" != "passed" ]]; then
-            echo "Build $BUILD_ID finished with status: $STATUS" >&2
+          # Run script and capture output; extract a 40-char hex build ID safely
+          TMP_OUT="$(mktemp)"
+          bash integration_test/run-browserstack-android.sh | tee "$TMP_OUT"
+          BUILD_ID=$(grep -Eo '[a-f0-9]{40}' "$TMP_OUT" | tail -n1 || true)
+          rm -f "$TMP_OUT"
+          if [[ -z "$BUILD_ID" ]]; then
+            echo "Could not extract BrowserStack build ID" >&2
             exit 1
           fi
-
-      - name: PR comment with BrowserStack build
-        if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: browserstack-android
-          message: |
-            BrowserStack Android build completed.
-            Build ID: ${{ steps.trigger.outputs.build_id }}
-            Status: ${{ steps.wait.outputs.status || 'unknown' }}
-            Passed: ${{ steps.wait.outputs.passed || '0' }}  Failed: ${{ steps.wait.outputs.failed || '0' }}
-            Dashboard: https://app-automate.browserstack.com/dashboard/v2/
-
-      - name: Job summary
-        if: always()
-        run: |
-          echo "## BrowserStack Android" >> $GITHUB_STEP_SUMMARY
-          echo "Build ID: ${{ steps.trigger.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "Status: ${{ steps.wait.outputs.status || 'unknown' }}" >> $GITHUB_STEP_SUMMARY
-          echo "Passed: ${{ steps.wait.outputs.passed || '0' }}  Failed: ${{ steps.wait.outputs.failed || '0' }}" >> $GITHUB_STEP_SUMMARY
-          echo "Dashboard: https://app-automate.browserstack.com/dashboard/v2/" >> $GITHUB_STEP_SUMMARY
+          echo "BrowserStack build ID: $BUILD_ID"
