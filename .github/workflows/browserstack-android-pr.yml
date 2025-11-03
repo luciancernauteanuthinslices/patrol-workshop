@@ -1,0 +1,62 @@
+name: BrowserStack Android PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  android-browserstack:
+    name: Android (BrowserStack)
+    runs-on: ubuntu-latest
+    env:
+      BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+      FLAVOR: prod
+      TARGET: integration_test/quiz_test.dart
+      PROJECT: patrol_workshop
+      DEVICES: '["Google Pixel 7-13.0"]'
+      BUILD_TAG: PR-${{ github.event.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Install Patrol CLI
+        run: |
+          dart pub global activate patrol_cli
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+      - name: Trigger BrowserStack Android build
+        shell: bash
+        run: |
+          set -eo pipefail
+          # Run script and capture output; extract a 40-char hex build ID safely
+          TMP_OUT="$(mktemp)"
+          bash integration_test/run-browserstack-android.sh | tee "$TMP_OUT"
+          BUILD_ID=$(grep -Eo '[a-f0-9]{40}' "$TMP_OUT" | tail -n1 || true)
+          rm -f "$TMP_OUT"
+          if [[ -z "$BUILD_ID" ]]; then
+            echo "Could not extract BrowserStack build ID" >&2
+            exit 1
+          fi
+          echo "BrowserStack build ID: $BUILD_ID"

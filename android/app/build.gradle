@@ -52,7 +52,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
-        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunner "pl.leancode.patrol.BrowserstackPatrolJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: "true"
     }
 

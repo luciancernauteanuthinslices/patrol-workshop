@@ -63,17 +63,20 @@ void main() {
       await $.pumpAndSettle();
 
       // Wait until first question appears (count-down is ~3 s)
-      await $.waitUntilVisible($(Text).containing('Question 1/3'), timeout: const Duration(seconds: 15));
+      await $('Question 1/3').waitUntilVisible(timeout: const Duration(seconds: 15));
 
-      // Question 1 - Select Fluttercon
-      await $(PTElevatedButton).containing('Fluttercon').tap();
+      // Question 1 - Select Fluttercon 
+      await $(PTElevatedButton)
+          .which<PTElevatedButton>((b) => b.caption == 'Fluttercon')
+          .tap();
       await $.pumpAndSettle();
 
       // Wait for Question 2 to appear
-      await $.waitUntilVisible($(Text).containing('Question 2/3'), timeout: const Duration(seconds: 10));
+      await $('Question 2/3').waitUntilVisible(timeout: const Duration(seconds: 15));
 
       // Question 2 - Select Flutter Dash
       final dashTile = $(ListTile).containing(Icons.flutter_dash);
+      await $.waitUntilVisible(dashTile, timeout: const Duration(seconds: 10));
       await dashTile.scrollTo();
       await dashTile.$(ElevatedButton).tap();
       await $.pumpAndSettle();
