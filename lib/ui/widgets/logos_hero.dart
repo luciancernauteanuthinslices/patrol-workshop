@@ -11,8 +11,21 @@ class LogoHero extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          PTImages.patrolLogo,
-          PTImages.leancodeLogo,
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: PTImages.patrolLogo,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: PTImages.leancodeLogo,
+            ),
+          ),
         ],
       ),
     );

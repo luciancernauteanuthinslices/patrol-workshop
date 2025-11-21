@@ -48,13 +48,25 @@ void main() {
       expect($(Text).containing('Ready'), findsOneWidget);
 
       // Select colors for robot check
-      await $(SelectableBox).which<SelectableBox>((b) => b.color == PTColors.lcYellow).tap();
+      final yellowBox = $(SelectableBox)
+          .which<SelectableBox>((b) => b.color == PTColors.lcYellow);
+      await $.waitUntilVisible(yellowBox, timeout: const Duration(seconds: 20));
+      await yellowBox.scrollTo();
+      await yellowBox.tap();
       await $.pumpAndSettle();
 
-      await $(SelectableBox).which<SelectableBox>((b) => b.color == PTColors.lcBlack).tap();
+      final blackBox = $(SelectableBox)
+          .which<SelectableBox>((b) => b.color == PTColors.lcBlack);
+      await $.waitUntilVisible(blackBox, timeout: const Duration(seconds: 20));
+      await blackBox.scrollTo();
+      await blackBox.tap();
       await $.pumpAndSettle();
 
-      await $(SelectableBox).which<SelectableBox>((b) => b.color == PTColors.lcWhite).tap();
+      final whiteBox = $(SelectableBox)
+          .which<SelectableBox>((b) => b.color == PTColors.lcWhite);
+      await $.waitUntilVisible(whiteBox, timeout: const Duration(seconds: 20));
+      await whiteBox.scrollTo();
+      await whiteBox.tap();
       await $.pumpAndSettle();
 
       // Slide the "Ready" slider to start the quiz
