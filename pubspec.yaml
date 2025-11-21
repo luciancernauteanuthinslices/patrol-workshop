@@ -8,6 +8,7 @@ environment:
   flutter: '>=3.16.0'
 
 dependencies:
+  path_provider: ^2.1.0
   animations: ^2.0.8
   confetti: ^0.7.0
   dispose_scope: ^2.1.0
@@ -67,5 +68,5 @@ patrol:
   app_name: Challange
   android:
     package_name: com.example.patrol_challenge
-  # ios:
-  #   bundle_id: pl.leancode.patrol.challenge.dev
+  ios:
+    bundle_id: pl.leancode.patrol.challenge.dev

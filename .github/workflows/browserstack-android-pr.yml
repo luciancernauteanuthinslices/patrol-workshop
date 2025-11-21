@@ -3,6 +3,7 @@ name: BrowserStack Android PR Checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -50,7 +51,6 @@ jobs:
         shell: bash
         run: |
           set -eo pipefail
-          # Run script and capture output; extract a 40-char hex build ID safely
           TMP_OUT="$(mktemp)"
           bash integration_test/run-browserstack-android.sh | tee "$TMP_OUT"
           BUILD_ID=$(grep -Eo '[a-f0-9]{40}' "$TMP_OUT" | tail -n1 || true)

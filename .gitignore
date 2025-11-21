@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .bs-auth
+.kobiton_auth
 
 # IntelliJ related
 *.iml
@@ -37,6 +38,10 @@ migrate_working_dir/
 
 # Symbolication related
 app.*.symbols
+
+#virtual env python
+integration_test/allure_schemathesis_reporting/myenv
+integration_test/allure_schemathesis_reporting/myenv/
 
 # Obfuscation related
 app.*.map.json

@@ -1,0 +1,4 @@
+# file: /Users/lucian.cernauteanuthinslices.com/Documents/Repos/Patrol_workshop_clone_new/patrol-workshop/./integration_test/allure_schemathesis_reporting/myenv/bin/schemathesis
+# hypothesis_version: 6.148.1
+
+['.exe', '__main__']

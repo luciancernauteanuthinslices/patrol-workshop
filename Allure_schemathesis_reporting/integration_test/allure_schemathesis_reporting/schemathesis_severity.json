@@ -1,0 +1,6 @@
+{
+  "_note": "Per-project risk management: adjust severities for your API.",
+  "version": 1,
+  "default_severity": "normal",
+  "rules": []
+}
