@@ -53,7 +53,7 @@ jobs:
           working-directory: android
 
       - name: Install Patrol CLI
-        run: dart pub global activate patrol_cli
+        run: dart pub global activate patrol_cli 3.10.0
 
       # NOTE: patrol test requires a running emulator or connected device
       # For CI, we need to start an Android emulator first
@@ -133,7 +133,7 @@ jobs:
           working-directory: ios
 
       - name: Install Patrol CLI
-        run: dart pub global activate patrol_cli
+        run: dart pub global activate patrol_cli 3.10.0
 
       - name: Get Flutter dependencies
         run: flutter pub get
