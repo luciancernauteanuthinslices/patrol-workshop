@@ -1,0 +1,158 @@
+name: Fastlane CI/CD
+
+on:
+  push:
+    branches: [main, kobiton]
+  pull_request:
+    branches: [main, kobiton]
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+env:
+  FLUTTER_VERSION: "3.35.7"
+
+jobs:
+  # Android - Build and Test
+  android:
+    name: Android - Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Install Patrol CLI
+        run: dart pub global activate patrol_cli
+
+      # NOTE: patrol test requires a running emulator or connected device
+      # For CI, we need to start an Android emulator first
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-33
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run Fastlane test lane (with emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          working-directory: android
+          script: |
+            export PATH="$HOME/.pub-cache/bin:$PATH"
+            bundle exec fastlane test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-results
+          path: |
+            build/app/outputs/
+          retention-days: 7
+
+  # iOS - Build and Test
+  ios:
+    name: iOS - Build & Test
+    runs-on: macos-14
+    timeout-minutes: 45 # Increased timeout for iOS simulator startup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Install Patrol CLI
+        run: dart pub global activate patrol_cli
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: List available simulators
+        run: xcrun simctl list devices available
+
+      # NOTE: Fastlane will handle the full build process
+      - name: Run Fastlane test lane
+        working-directory: ios
+        run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          bundle exec fastlane test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: |
+            build/ios/
+          retention-days: 7

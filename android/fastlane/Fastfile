@@ -1,0 +1,47 @@
+# Fastfile for Android
+# This file contains the fastlane.tools configuration
+default_platform(:android)
+
+platform :android do
+  desc "Run Patrol integration tests on Android"
+  lane :test do
+    # Install dependencies
+    sh("cd ../.. && flutter pub get")
+    # Run Patrol tests - uses default test_bundle.dart
+    # This will build the APKs and execute the tests on connected device/emulator
+    sh("cd ../.. && patrol test android --verbose")
+    UI.success("✅ Android Patrol tests completed!")
+  end
+
+  desc "Build Android release APK"
+  lane :build_release do
+    sh("cd ../.. && flutter clean")
+    sh("cd ../.. && flutter pub get")
+    sh("cd ../.. && flutter build apk --release")
+    UI.success("✅ Release APK built!")
+    UI.message("APK: build/app/outputs/flutter-apk/app-release.apk")
+  end
+
+  desc "Build APKs only (without running tests)"
+  lane :build_apks do
+    # Install dependencies
+    sh("cd ../.. && flutter pub get")
+
+    # Build APKs with Patrol (for uploading to Firebase Test Lab, etc.)
+    sh("cd ../.. && patrol build android --verbose")
+    UI.success("✅ Android test APKs built successfully!")
+    UI.message("App APK: build/app/outputs/apk/debug/app-debug.apk")
+    UI.message("Test APK: build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk")
+  end
+
+  desc "Build and deploy to internal testing"
+  lane :deploy_internal do
+    build_release
+    # TODO: Add Play Store upload when ready
+    # upload_to_play_store(
+    #   track: 'internal',
+    #   apk: '../build/app/outputs/flutter-apk/app-release.apk'
+    # )
+    UI.success("✅ Ready for internal deployment!")
+  end
+end
