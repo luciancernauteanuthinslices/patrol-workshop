@@ -13,10 +13,6 @@ import 'package:patrol_challenge/ui/style/colors.dart';
 void main() {
   patrolTest(
     'quiz can be completed',
-    config: PatrolTesterConfig(
-      visibleTimeout: const Duration(seconds: 10),
-      existsTimeout: const Duration(seconds: 10),
-    ),
     ($) async {
       await initApp();
       await $.pumpWidgetAndSettle(const MyApp());
@@ -84,10 +80,9 @@ void main() {
           .waitUntilVisible(timeout: const Duration(seconds: 15));
 
       // Question 1 - Select Fluttercon 
-      final flutterconButton = $(PTElevatedButton)
-          .which<PTElevatedButton>((b) => b.caption == 'Fluttercon');
-      await flutterconButton.scrollTo();
-      await flutterconButton.tap();
+      // final flutterconButton = $(PTElevatedButton)
+      //     .which<PTElevatedButton>((b) => b.caption == 'Fluttercon');
+      await $(K.flutterconButton).tap();
       await $.pumpAndSettle();
 
       // Wait for Question 2 to appear

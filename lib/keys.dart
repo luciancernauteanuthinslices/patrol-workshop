@@ -9,4 +9,5 @@ class PatrolKeys {
   static const notifyMeButton = Key('notifyMeButton');
   static const yourLocationText = Key('yourLocationText');
   static const goBackButton = Key('goBackButton');
+  static const flutterconButton = Key('flutterconButtonKey');
 }

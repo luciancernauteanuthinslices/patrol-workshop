@@ -86,6 +86,7 @@ class _QuestionsPageState extends State<_QuestionsPage> {
         trailing: const Text('Fluttercon'),
       ),
       PTElevatedButton(
+        key: const Key('flutterconButtonKey'),
         onPressed: _showNextQuestion,
         caption: 'Fluttercon',
       ),
