@@ -5,13 +5,20 @@ default_platform(:android)
 platform :android do
   desc "Run Patrol integration tests on Android"
   lane :test do
-    # Install dependencies
-    sh("cd ../.. && flutter pub get")
-    # Run Patrol tests - uses default test_bundle.dart
-    # This will build the APKs and execute the tests on connected device/emulator
-    sh("cd ../.. && patrol test android --verbose")
-    UI.success("✅ Android Patrol tests completed!")
+    begin
+      # Install dependencies
+      sh("cd ../.. && flutter pub get")
+      # Run Patrol tests - uses default test_bundle.dart
+      # This will build the APKs and execute the tests on connected device/emulator
+      sh("cd ../.. && patrol test android --verbose")
+      UI.success("✅ Android Patrol tests completed!")
+    ensure
+      UI.message("Saving logcat to android_test_logcat.txt for CI artifacts...")
+      # Save logcat one level above /android so GitHub Actions can upload it from repo root
+      sh("adb logcat -d > ../android_test_logcat.txt || true")
+    end
   end
+  
 
   desc "Build Android release APK"
   lane :build_release do

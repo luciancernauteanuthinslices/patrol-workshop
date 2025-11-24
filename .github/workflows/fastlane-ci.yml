@@ -104,6 +104,15 @@ jobs:
           path: |
             build/app/outputs/
           retention-days: 7
+      
+      - name: Upload logcat
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logcat
+          path: |
+            android_test_logcat.txt
+          retention-days: 7
 
   # iOS - Build and Test
   ios:
