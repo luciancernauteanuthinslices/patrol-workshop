@@ -74,6 +74,8 @@ void main() {
       await $.tester.drag(arrow, const Offset(500, 0));
       await $.pumpAndSettle();
 
+      debugPrint('"Ready" slider is dragged');
+
       // Wait until first question appears (count-down is ~3 s)
       // await $('Question 1/3').waitUntilVisible(timeout: const Duration(seconds: 15));
       // await $('Question 1/3')
