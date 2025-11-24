@@ -82,6 +82,9 @@ void main() {
       // Question 1 - Select Fluttercon 
       // final flutterconButton = $(PTElevatedButton)
       //     .which<PTElevatedButton>((b) => b.caption == 'Fluttercon');
+
+      const Timeout(Duration(seconds: 10));
+
       await $(K.flutterconButton).tap();
       await $.pumpAndSettle();
 

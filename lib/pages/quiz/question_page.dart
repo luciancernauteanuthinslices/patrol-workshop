@@ -207,6 +207,7 @@ class _EnabledButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PTElevatedButton(
+
       caption: 'click',
       trailing: showTrailing ? const _Dash(color: PTColors.lcBlack) : null,
       onPressed: onPressed,
