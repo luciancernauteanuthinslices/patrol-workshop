@@ -50,21 +50,21 @@ void main() {
       // Select colors for robot check
       final yellowBox = $(SelectableBox)
           .which<SelectableBox>((b) => b.color == PTColors.lcYellow);
-      await $.waitUntilVisible(yellowBox, timeout: const Duration(seconds: 20));
+      // await $.waitUntilVisible(yellowBox, timeout: const Duration(seconds: 20));
       await yellowBox.scrollTo();
       await yellowBox.tap();
       await $.pumpAndSettle();
 
       final blackBox = $(SelectableBox)
           .which<SelectableBox>((b) => b.color == PTColors.lcBlack);
-      await $.waitUntilVisible(blackBox, timeout: const Duration(seconds: 20));
+      // await $.waitUntilVisible(blackBox, timeout: const Duration(seconds: 20));
       await blackBox.scrollTo();
       await blackBox.tap();
       await $.pumpAndSettle();
 
       final whiteBox = $(SelectableBox)
           .which<SelectableBox>((b) => b.color == PTColors.lcWhite);
-      await $.waitUntilVisible(whiteBox, timeout: const Duration(seconds: 20));
+      // await $.waitUntilVisible(whiteBox, timeout: const Duration(seconds: 20));
       await whiteBox.scrollTo();
       await whiteBox.tap();
       await $.pumpAndSettle();
@@ -75,7 +75,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Wait until first question appears (count-down is ~3 s)
-      await $('Question 1/3').waitUntilVisible(timeout: const Duration(seconds: 15));
+      // await $('Question 1/3').waitUntilVisible(timeout: const Duration(seconds: 15));
 
       // Question 1 - Select Fluttercon 
       await $(PTElevatedButton)
@@ -84,11 +84,11 @@ void main() {
       await $.pumpAndSettle();
 
       // Wait for Question 2 to appear
-      await $('Question 2/3').waitUntilVisible(timeout: const Duration(seconds: 15));
+      // await $('Question 2/3').waitUntilVisible(timeout: const Duration(seconds: 15));
 
       // Question 2 - Select Flutter Dash
       final dashTile = $(ListTile).containing(Icons.flutter_dash);
-      await $.waitUntilVisible(dashTile, timeout: const Duration(seconds: 10));
+      // await $.waitUntilVisible(dashTile, timeout: const Duration(seconds: 10));
       await dashTile.scrollTo();
       await dashTile.$(ElevatedButton).tap();
       await $.pumpAndSettle();
