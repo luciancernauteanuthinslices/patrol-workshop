@@ -12,7 +12,7 @@ import 'package:patrol_challenge/ui/style/colors.dart';
 /// See [PTColors] for color constants
 void main() {
   patrolTest(
-    'quiz can be completed',
+    'quiz can be completed', config: PatrolTestConfig(findTimeout: Duration(seconds: 10)),
     ($) async {
       await initApp();
       await $.pumpWidgetAndSettle(const MyApp());
