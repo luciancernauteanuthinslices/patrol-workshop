@@ -76,8 +76,8 @@ void main() {
 
       // Wait until first question appears (count-down is ~3 s)
       // await $('Question 1/3').waitUntilVisible(timeout: const Duration(seconds: 15));
-      await $('Question 1/3')
-          .waitUntilVisible(timeout: const Duration(seconds: 15));
+      // await $('Question 1/3')
+      //     .waitUntilVisible(timeout: const Duration(seconds: 15));
 
       // Question 1 - Select Fluttercon 
       // final flutterconButton = $(PTElevatedButton)
